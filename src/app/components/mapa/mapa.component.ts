@@ -46,11 +46,24 @@ export class MapaComponent implements AfterViewInit {
     }
     this.map = new google.maps.Map(this.mapaElement.nativeElement, mapOpciones)
 
+    this.map.addListener('click', (coordenadas: any) => {
+      const nuevoMarcador: Lugar = {
+        nombre: 'Nuevo marcador',
+        lat: coordenadas.latLng.lat(),
+        lng: coordenadas.latLng.lng(),
+        id: new Date().toISOString()
+      }
+      this.agregarMarcador(nuevoMarcador)
+
+      // TODO: Emitir un evento de socket, para agregar marcador
+    })
+
     for (const lugar of this.lugares) {
       this.agregarMarcador(lugar)
     }
   }
 
+  // Agregar nuevo marcador al mapa
   agregarMarcador (marcador: Lugar): void {
     const latlng = new google.maps.LatLng(marcador.lat, marcador.lng)
 
