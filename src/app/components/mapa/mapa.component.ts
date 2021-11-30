@@ -9,7 +9,9 @@ import { Lugar } from '../../interfaces/interface'
 export class MapaComponent implements AfterViewInit {
   @ViewChild('map', { static: true }) mapaElement!: ElementRef
   map!: google.maps.Map
+
   marcadores: google.maps.Marker[] = []
+  infoWindows: google.maps.InfoWindow[] = []
 
   lugares: Lugar[] = [
     {
@@ -59,6 +61,35 @@ export class MapaComponent implements AfterViewInit {
       draggable: true
     })
 
-    this.marcadores.push(marker)
+    const content = `<b>${marcador.nombre}</b>`
+    const infoWindow = new google.maps.InfoWindow({ content })
+
+    this.marcadores.push(marker) // Agregamos el marcador a la lista de marcadores
+    this.infoWindows.push(infoWindow) // Agregamos el infoWindow a la lista de infoWindows
+
+    // Click para mostrar el contenido del marcador
+    google.maps.event.addDomListener(marker, 'click', () => {
+      // Primero se cierra el infoWindow anterior si existe, para luego mostrar el nuevo
+      this.infoWindows.forEach((infoW) => (infoW.close()))
+      infoWindow.open(this.map, marker)
+    })
+
+    // Doble click para borrar el marcador
+    google.maps.event.addDomListener(marker, 'dblclick', () => {
+      marker.setMap(null)
+      // TODO: Disparar un evento de socket, para borrar el marcador
+    })
+
+    // Arrastrar el marcador
+    google.maps.event.addDomListener(marker, 'drag', (coordenadas: any) => {
+      const nuevoMarcador: Lugar = {
+        lat: coordenadas.latLng.lat(),
+        lng: coordenadas.latLng.lng(),
+        nombre: marcador.nombre
+      }
+
+      console.log(nuevoMarcador)
+      // TODO: Disparar un evento de socket, para mover el marcador
+    })
   }
 }
