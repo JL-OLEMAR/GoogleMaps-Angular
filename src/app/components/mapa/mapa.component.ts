@@ -35,11 +35,13 @@ export class MapaComponent implements OnInit {
 
   escucharSocket (): void {
     // marcador-nuevo
+    this.wsService.listen('marcador-nuevo').subscribe((marcador: Lugar) => {
+      this.agregarMarcador(marcador)
+    })
 
     // marcador-mover
 
     // marcador-borrar
-
   }
 
   cargarMapa (): any {
@@ -60,7 +62,8 @@ export class MapaComponent implements OnInit {
       }
       this.agregarMarcador(nuevoMarcador)
 
-      // TODO: Emitir un evento de socket, para agregar marcador
+      // Emitir un evento de socket, para agregar marcador
+      this.wsService.emit('marcador-nuevo', nuevoMarcador)
     })
 
     for (const lugar of this.lugares) {
