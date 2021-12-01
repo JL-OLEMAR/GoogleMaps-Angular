@@ -1,5 +1,7 @@
 import { Component, ElementRef, ViewChild, OnInit } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
+
+import { WebsocketService } from '../../services/websocket.service'
 import { Lugar } from '../../interfaces/interface'
 
 @Component({
@@ -16,7 +18,10 @@ export class MapaComponent implements OnInit {
 
   lugares: Lugar[] = []
 
-  constructor (private readonly http: HttpClient) { }
+  constructor (
+    private readonly http: HttpClient,
+    public wsService: WebsocketService
+  ) { }
 
   ngOnInit (): void {
     this.http.get<Lugar[]>('http://localhost:5000/googleMaps')
