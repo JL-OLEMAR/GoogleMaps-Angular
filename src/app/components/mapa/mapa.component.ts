@@ -45,11 +45,21 @@ export class MapaComponent implements OnInit {
       for (const i in this.marcadores) {
         if (this.marcadores[i].getTitle() === id) {
           this.marcadores[i].setMap(null)
+          break
         }
       }
     })
 
     // marcador-mover
+    this.wsService.listen('marcador-mover').subscribe((marcador: Lugar) => {
+      for (const i in this.marcadores) {
+        if (this.marcadores[i].getTitle() === marcador.id) {
+          const latLng = new google.maps.LatLng(marcador.lat, marcador.lng)
+          this.marcadores[i].setPosition(latLng)
+          break
+        }
+      }
+    })
   }
 
   cargarMapa (): any {
@@ -120,8 +130,8 @@ export class MapaComponent implements OnInit {
         id: marker.getTitle()
       }
 
-      console.log(nuevoMarcador)
-      // TODO: Disparar un evento de socket, para mover el marcador
+      // Disparar un evento de socket, para mover el marcador
+      this.wsService.emit('marcador-mover', nuevoMarcador)
     })
   }
 }
