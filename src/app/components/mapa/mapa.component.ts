@@ -1,4 +1,5 @@
-import { Component, ElementRef, AfterViewInit, ViewChild } from '@angular/core'
+import { Component, ElementRef, ViewChild, OnInit } from '@angular/core'
+import { HttpClient } from '@angular/common/http'
 import { Lugar } from '../../interfaces/interface'
 
 @Component({
@@ -6,35 +7,34 @@ import { Lugar } from '../../interfaces/interface'
   templateUrl: './mapa.component.html',
   styles: []
 })
-export class MapaComponent implements AfterViewInit {
+export class MapaComponent implements OnInit {
   @ViewChild('map', { static: true }) mapaElement!: ElementRef
   map!: google.maps.Map
 
   marcadores: google.maps.Marker[] = []
   infoWindows: google.maps.InfoWindow[] = []
 
-  lugares: Lugar[] = [
-    {
-      nombre: 'Udemy',
-      lat: 37.784679,
-      lng: -122.395936
-    },
-    {
-      nombre: 'Bahía de San Francisco',
-      lat: 37.798933,
-      lng: -122.377732
-    },
-    {
-      nombre: 'The Palace Hotel',
-      lat: 37.788578,
-      lng: -122.401745
-    }
-  ]
+  lugares: Lugar[] = []
 
-  // constructor () { }
+  constructor (private readonly http: HttpClient) { }
 
-  ngAfterViewInit (): void {
-    this.cargarMapa()
+  ngOnInit (): void {
+    this.http.get<Lugar[]>('http://localhost:5000/googleMaps')
+      .subscribe((lugares: Lugar[]) => {
+        this.lugares = lugares
+        this.cargarMapa()
+      })
+
+    this.escucharSocket()
+  }
+
+  escucharSocket (): void {
+    // marcador-nuevo
+
+    // marcador-mover
+
+    // marcador-borrar
+
   }
 
   cargarMapa (): any {
@@ -71,7 +71,8 @@ export class MapaComponent implements AfterViewInit {
       map: this.map,
       animation: google.maps.Animation.DROP,
       position: latlng,
-      draggable: true
+      draggable: true,
+      title: marcador.id
     })
 
     const content = `<b>${marcador.nombre}</b>`
@@ -98,7 +99,8 @@ export class MapaComponent implements AfterViewInit {
       const nuevoMarcador: Lugar = {
         lat: coordenadas.latLng.lat(),
         lng: coordenadas.latLng.lng(),
-        nombre: marcador.nombre
+        nombre: marcador.nombre,
+        id: marker.getTitle()
       }
 
       console.log(nuevoMarcador)
