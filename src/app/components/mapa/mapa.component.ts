@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-for-in-array */
 import { Component, ElementRef, ViewChild, OnInit } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 
@@ -39,9 +40,16 @@ export class MapaComponent implements OnInit {
       this.agregarMarcador(marcador)
     })
 
-    // marcador-mover
-
     // marcador-borrar
+    this.wsService.listen('marcador-borrar').subscribe((id: string) => {
+      for (const i in this.marcadores) {
+        if (this.marcadores[i].getTitle() === id) {
+          this.marcadores[i].setMap(null)
+        }
+      }
+    })
+
+    // marcador-mover
   }
 
   cargarMapa (): any {
@@ -99,7 +107,8 @@ export class MapaComponent implements OnInit {
     // Doble click para borrar el marcador
     google.maps.event.addDomListener(marker, 'dblclick', () => {
       marker.setMap(null)
-      // TODO: Disparar un evento de socket, para borrar el marcador
+      // Disparar un evento de socket, para borrar el marcador
+      this.wsService.emit('marcador-borrar', marcador.id)
     })
 
     // Arrastrar el marcador
