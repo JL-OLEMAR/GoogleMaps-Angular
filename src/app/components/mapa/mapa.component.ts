@@ -101,10 +101,11 @@ export class MapaComponent implements OnInit {
       title: marcador.id
     })
 
+    this.marcadores.push(marker) // Agregamos el marcador a la lista de marcadores
+
     const content = `<b>${marcador.nombre}</b>`
     const infoWindow = new google.maps.InfoWindow({ content })
 
-    this.marcadores.push(marker) // Agregamos el marcador a la lista de marcadores
     this.infoWindows.push(infoWindow) // Agregamos el infoWindow a la lista de infoWindows
 
     // Click para mostrar el contenido del marcador
@@ -127,7 +128,7 @@ export class MapaComponent implements OnInit {
         lat: coordenadas.latLng.lat(),
         lng: coordenadas.latLng.lng(),
         nombre: marcador.nombre,
-        id: marker.getTitle()
+        id: marcador.id
       }
 
       // Disparar un evento de socket, para mover el marcador
